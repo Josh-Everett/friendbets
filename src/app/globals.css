@@ -1,26 +1,114 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f1728;
+  --background-card: #151d30;
+  --background-elevated: #1a2340;
+  --foreground: #ffffff;
+  --foreground-secondary: #a2a8cc;
+  --accent-primary: #ba0963;
+  --accent-primary-hover: #d40a72;
+  --accent-gold: #fdd160;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-card: var(--background-card);
+  --color-background-elevated: var(--background-elevated);
   --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-gold: var(--accent-gold);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-light: var(--border-light);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(21, 29, 48, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.5rem;
+    background-color: var(--accent-primary);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--accent-primary-hover);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.5rem;
+    background-color: transparent;
+    color: var(--foreground-secondary);
+    font-weight: 600;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.5rem;
+    background-color: var(--accent-gold);
+    color: #0f1728;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-gold:hover {
+    background-color: #fee088;
+  }
+
+  .btn-gold:active {
+    transform: scale(0.98);
+  }
 }
