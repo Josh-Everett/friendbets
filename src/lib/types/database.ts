@@ -30,6 +30,7 @@ export interface Database {
         Row: {
           id: string
           name: string
+          slug: string
           description: string | null
           currency_name: string
           currency_symbol: string
@@ -43,6 +44,7 @@ export interface Database {
         Insert: {
           id?: string
           name: string
+          slug: string
           description?: string | null
           currency_name?: string
           currency_symbol?: string
@@ -56,6 +58,7 @@ export interface Database {
         Update: {
           id?: string
           name?: string
+          slug?: string
           description?: string | null
           currency_name?: string
           currency_symbol?: string
@@ -421,7 +424,7 @@ export interface Database {
         Args: {
           p_name: string; p_description: string | null;
           p_currency_name: string | null; p_currency_symbol: string | null;
-          p_starting_balance: number
+          p_starting_balance: number; p_slug: string | null
         }
         Returns: string
       }

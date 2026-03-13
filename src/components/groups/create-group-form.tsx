@@ -38,7 +38,7 @@ export function CreateGroupForm() {
       setLoading(false)
     } else {
       const data = await res.json()
-      router.push(`/groups/${data.id}`)
+      router.push(`/groups/${data.slug}`)
       router.refresh()
     }
   }

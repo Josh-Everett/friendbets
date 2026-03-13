@@ -29,6 +29,15 @@ export function getInitials(name: string): string {
     .slice(0, 2)
 }
 
+export function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 export function calculatePayout(
   wagerAmount: number,
   totalWinnerPool: number,

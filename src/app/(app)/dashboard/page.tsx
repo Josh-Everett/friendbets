@@ -38,7 +38,7 @@ export default async function DashboardPage() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {groups.map((group: any) => (
-              <Link key={group.id} href={`/groups/${group.id}`}>
+              <Link key={group.id} href={`/groups/${group.slug}`}>
                 <Card className="hover:border-white/10 transition-colors cursor-pointer h-full">
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between mb-3">

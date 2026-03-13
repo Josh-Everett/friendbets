@@ -11,6 +11,7 @@ import { useRealtimeBets } from '@/hooks/use-realtime-bets'
 
 interface BetFeedProps {
   groupId: string
+  groupSlug: string
   userId: string
   members: any[]
   currencySymbol: string
@@ -18,7 +19,7 @@ interface BetFeedProps {
   startingBalance: number
 }
 
-export function BetFeed({ groupId, userId, members, currencySymbol, userBalance, startingBalance }: BetFeedProps) {
+export function BetFeed({ groupId, groupSlug, userId, members, currencySymbol, userBalance, startingBalance }: BetFeedProps) {
   const bets = useRealtimeBets(groupId)
   const [showCreate, setShowCreate] = useState(false)
 
@@ -46,7 +47,7 @@ export function BetFeed({ groupId, userId, members, currencySymbol, userBalance,
             <BetCard
               key={bet.id}
               bet={bet}
-              groupId={groupId}
+              groupSlug={groupSlug}
               currencySymbol={currencySymbol}
             />
           ))}

@@ -13,7 +13,7 @@ interface JoinGroupClientProps {
   currencySymbol: string
   startingBalance: number
   inviteCode: string
-  groupId: string
+  groupSlug: string
 }
 
 export function JoinGroupClient({
@@ -23,7 +23,7 @@ export function JoinGroupClient({
   currencySymbol,
   startingBalance,
   inviteCode,
-  groupId,
+  groupSlug,
 }: JoinGroupClientProps) {
   const router = useRouter()
   const supabase = useSupabase()
@@ -45,7 +45,7 @@ export function JoinGroupClient({
       setError(data.error || 'Failed to join group')
       setLoading(false)
     } else {
-      router.push(`/groups/${groupId}`)
+      router.push(`/groups/${groupSlug}`)
       router.refresh()
     }
   }

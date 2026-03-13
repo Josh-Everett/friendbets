@@ -8,11 +8,11 @@ import { getPrices, formatProbability } from '@/lib/amm'
 
 interface BetCardProps {
   bet: any
-  groupId: string
+  groupSlug: string
   currencySymbol: string
 }
 
-export function BetCard({ bet, groupId, currencySymbol }: BetCardProps) {
+export function BetCard({ bet, groupSlug, currencySymbol }: BetCardProps) {
   const creatorName = bet.profiles?.display_name || bet.profiles?.username || 'Unknown'
 
   const prices = bet.yes_pool && bet.no_pool && bet.k
@@ -20,7 +20,7 @@ export function BetCard({ bet, groupId, currencySymbol }: BetCardProps) {
     : null
 
   return (
-    <Link href={`/groups/${groupId}/bets/${bet.id}`}>
+    <Link href={`/groups/${groupSlug}/bets/${bet.id}`}>
       <Card className="hover:border-white/10 transition-colors cursor-pointer">
         <CardContent className="py-4">
           <div className="flex items-start justify-between gap-4">

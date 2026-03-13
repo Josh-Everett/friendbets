@@ -13,8 +13,8 @@ import { getPrices, formatOdds, formatProbability, estimatePayout } from '@/lib/
 import { OddsChart } from '@/components/charts/odds-chart'
 import { WagerBreakdownBar } from '@/components/charts/wager-breakdown-bar'
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string; betId: string }> }): Promise<Metadata> {
-  const { id: groupId, betId } = await params
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; betId: string }> }): Promise<Metadata> {
+  const { slug, betId } = await params
   const supabase = await createClient()
 
   const { data: bet } = await supabase
@@ -53,11 +53,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function BetDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; betId: string }>
+  params: Promise<{ slug: string; betId: string }>
 }) {
-  const { id: groupId, betId } = await params
+  const { slug, betId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Get group by slug
+  const { data: groupData } = await supabase
+    .from('groups')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (!groupData) notFound()
+  const group = groupData as any
+  const groupId = group.id
 
   // Verify membership
   const { data: membershipData } = await supabase
@@ -96,14 +107,6 @@ export default async function BetDetailPage({
       .single()
     subjectProfile = data
   }
-
-  // Get group info
-  const { data: groupData } = await supabase
-    .from('groups')
-    .select('*')
-    .eq('id', groupId)
-    .single()
-  const group = groupData as any
 
   // Get all group members for vote resolution
   const { data: membersData } = await supabase
@@ -149,7 +152,7 @@ export default async function BetDetailPage({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Back link */}
-      <a href={`/groups/${groupId}`} className="text-sm text-[#a2a8cc] hover:text-white">
+      <a href={`/groups/${slug}`} className="text-sm text-[#a2a8cc] hover:text-white">
         &larr; Back to bets
       </a>
 

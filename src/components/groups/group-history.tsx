@@ -11,10 +11,11 @@ import Link from 'next/link'
 
 interface GroupHistoryProps {
   groupId: string
+  groupSlug: string
   currencySymbol: string
 }
 
-export function GroupHistory({ groupId, currencySymbol }: GroupHistoryProps) {
+export function GroupHistory({ groupId, groupSlug, currencySymbol }: GroupHistoryProps) {
   const supabase = useSupabase()
   const [bets, setBets] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,7 +65,7 @@ export function GroupHistory({ groupId, currencySymbol }: GroupHistoryProps) {
       {bets.map((bet: any) => {
         const totalPool = bet.bet_wagers?.reduce((s: number, w: any) => s + w.amount, 0) ?? 0
         return (
-          <Link key={bet.id} href={`/groups/${groupId}/bets/${bet.id}`}>
+          <Link key={bet.id} href={`/groups/${groupSlug}/bets/${bet.id}`}>
             <Card className="hover:border-white/10 transition-colors cursor-pointer">
               <CardContent className="py-4">
                 <div className="flex items-start justify-between gap-4">

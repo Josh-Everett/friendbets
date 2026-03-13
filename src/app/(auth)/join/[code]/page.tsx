@@ -97,11 +97,11 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
     .eq('user_id', user.id)
     .single()
 
-  if (existingMember) {
-    redirect(`/groups/${invite.group_id}`)
-  }
-
   const group = invite.groups as any
+
+  if (existingMember) {
+    redirect(`/groups/${group.slug}`)
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -112,7 +112,7 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
         currencySymbol={group.currency_symbol}
         startingBalance={group.starting_balance}
         inviteCode={code.toUpperCase()}
-        groupId={invite.group_id}
+        groupSlug={group.slug}
       />
     </div>
   )

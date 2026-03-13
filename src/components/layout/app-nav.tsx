@@ -10,7 +10,7 @@ import type { Profile } from '@/lib/types/app'
 interface AppNavProps {
   user: { id: string; email: string }
   profile: Profile | null
-  groups: { id: string; name: string; currency_symbol: string }[]
+  groups: { id: string; slug: string; name: string; currency_symbol: string }[]
 }
 
 export function AppNav({ user, profile, groups }: AppNavProps) {
@@ -49,7 +49,7 @@ export function AppNav({ user, profile, groups }: AppNavProps) {
                   {groups.map((g) => (
                     <a
                       key={g.id}
-                      href={`/groups/${g.id}`}
+                      href={`/groups/${g.slug}`}
                       className="block px-4 py-2 text-sm text-[#a2a8cc] hover:text-white hover:bg-white/5"
                       onClick={() => setGroupMenuOpen(false)}
                     >

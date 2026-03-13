@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
 interface GroupTabsProps {
-  groupId: string
+  groupSlug: string
   activeTab: string
   isAdmin: boolean
 }
@@ -17,7 +17,7 @@ const tabs = [
   { id: 'settings', label: 'Settings', adminOnly: true },
 ]
 
-export function GroupTabs({ groupId, activeTab, isAdmin }: GroupTabsProps) {
+export function GroupTabs({ groupSlug, activeTab, isAdmin }: GroupTabsProps) {
   const visibleTabs = tabs.filter((t) => !t.adminOnly || isAdmin)
 
   return (
@@ -25,7 +25,7 @@ export function GroupTabs({ groupId, activeTab, isAdmin }: GroupTabsProps) {
       {visibleTabs.map((tab) => (
         <Link
           key={tab.id}
-          href={`/groups/${groupId}?tab=${tab.id}`}
+          href={`/groups/${groupSlug}?tab=${tab.id}`}
           className={cn(
             'px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px',
             activeTab === tab.id

@@ -13,33 +13,34 @@ export default async function GroupPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
   searchParams: Promise<{ tab?: string }>
 }) {
-  const { id } = await params
+  const { slug } = await params
   const { tab = 'bets' } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Get group
+  // Get group by slug
   const { data: groupData } = await supabase
     .from('groups')
     .select('*')
-    .eq('id', id)
+    .eq('slug', slug)
     .single()
 
   if (!groupData) notFound()
   let group = groupData as any
+  const groupId = group.id
 
   // Check for season reset
   if (group.season_end_at && new Date(group.season_end_at) < new Date()) {
     try {
-      await (supabase.rpc as any)('reset_season', { p_group_id: id })
+      await (supabase.rpc as any)('reset_season', { p_group_id: groupId })
       // Re-fetch group data after reset
       const { data: refreshedGroup } = await supabase
         .from('groups')
         .select('*')
-        .eq('id', id)
+        .eq('id', groupId)
         .single()
       if (refreshedGroup) group = refreshedGroup as any
     } catch {
@@ -51,7 +52,7 @@ export default async function GroupPage({
   const { data: membershipData } = await supabase
     .from('group_members')
     .select('*')
-    .eq('group_id', id)
+    .eq('group_id', groupId)
     .eq('user_id', user!.id)
     .single()
 
@@ -62,7 +63,7 @@ export default async function GroupPage({
   const { data: membersData } = await supabase
     .from('group_members')
     .select('*, profiles(*)')
-    .eq('group_id', id)
+    .eq('group_id', groupId)
     .order('balance', { ascending: false })
 
   const members = (membersData ?? []) as any[]
@@ -72,7 +73,7 @@ export default async function GroupPage({
       <div>
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold text-white">{group.name}</h1>
-          <CopyInviteButton groupId={id} />
+          <CopyInviteButton groupId={groupId} />
         </div>
         {group.description && (
           <p className="text-[#a2a8cc] mt-1">{group.description}</p>
@@ -87,11 +88,12 @@ export default async function GroupPage({
         </div>
       </div>
 
-      <GroupTabs groupId={id} activeTab={tab} isAdmin={membership.role === 'admin'} />
+      <GroupTabs groupSlug={slug} activeTab={tab} isAdmin={membership.role === 'admin'} />
 
       {tab === 'bets' && (
         <BetFeed
-          groupId={id}
+          groupId={groupId}
+          groupSlug={slug}
           userId={user!.id}
           members={members}
           currencySymbol={group.currency_symbol}
@@ -102,7 +104,7 @@ export default async function GroupPage({
       {tab === 'leaderboard' && (
         <>
           <BalanceHistoryChart
-            groupId={id}
+            groupId={groupId}
             members={members}
             currencySymbol={group.currency_symbol}
             startingBalance={group.starting_balance}
@@ -114,10 +116,10 @@ export default async function GroupPage({
         </>
       )}
       {tab === 'history' && (
-        <GroupHistory groupId={id} currencySymbol={group.currency_symbol} />
+        <GroupHistory groupId={groupId} groupSlug={slug} currencySymbol={group.currency_symbol} />
       )}
       {tab === 'achievements' && (
-        <AchievementsList groupId={id} />
+        <AchievementsList groupId={groupId} />
       )}
       {tab === 'settings' && membership.role === 'admin' && (
         <GroupSettings group={group} members={members} />

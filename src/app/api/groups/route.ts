@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { generateSlug } from '@/lib/utils'
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -37,6 +38,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Starting balance must be an integer between 100 and 1,000,000' }, { status: 400 })
   }
 
+  const slug = generateSlug(name)
+
   // Use atomic create_group RPC — creates group + admin member + invite code in one transaction
   const { data: group_id, error } = await (supabase.rpc as any)('create_group', {
     p_name: name,
@@ -44,11 +47,19 @@ export async function POST(request: Request) {
     p_currency_name: currency_name || null,
     p_currency_symbol: currency_symbol || null,
     p_starting_balance: balance,
+    p_slug: slug,
   })
 
   if (error) {
     return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })
   }
 
-  return NextResponse.json({ id: group_id })
+  // Fetch the slug back (DB may have appended a suffix for uniqueness)
+  const { data: groupData } = await supabase
+    .from('groups')
+    .select('slug')
+    .eq('id', group_id)
+    .single() as { data: any }
+
+  return NextResponse.json({ id: group_id, slug: groupData?.slug ?? slug })
 }

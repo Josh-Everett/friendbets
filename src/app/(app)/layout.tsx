@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Get user's groups for the group switcher
   const { data: memberships } = await supabase
     .from('group_members')
-    .select('group_id, groups(id, name, currency_symbol)')
+    .select('group_id, groups(id, slug, name, currency_symbol)')
     .eq('user_id', user.id) as { data: any[] | null }
 
   const groups = memberships?.map((m: any) => m.groups).filter(Boolean) ?? []

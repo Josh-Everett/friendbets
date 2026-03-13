@@ -15,7 +15,7 @@ export default async function ProfilePage() {
 
   const { data: memberships } = await supabase
     .from('group_members')
-    .select('*, groups(name, currency_symbol)')
+    .select('*, groups(name, slug, currency_symbol)')
     .eq('user_id', user!.id) as { data: any[] | null }
 
   // Get bet stats
@@ -87,7 +87,7 @@ export default async function ProfilePage() {
               {memberships.map((m: any) => (
                 <a
                   key={m.id}
-                  href={`/groups/${m.group_id}`}
+                  href={`/groups/${m.groups.slug}`}
                   className="flex items-center justify-between py-2 hover:bg-white/5 -mx-2 px-2 rounded-lg transition-colors"
                 >
                   <span className="text-white">{m.groups.name}</span>
