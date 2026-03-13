@@ -17,10 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug, betId } = await params
   const supabase = await createClient()
 
+  // Look up group to get group_id for short_id scoping
+  const { data: metaGroup } = await supabase
+    .from('groups')
+    .select('id')
+    .eq('slug', slug)
+    .single() as { data: any }
+
+  if (!metaGroup) return { title: 'Bet' }
+
   const { data: bet } = await supabase
     .from('bets')
     .select('title, description, status, bet_wagers(amount, side)')
-    .eq('id', betId)
+    .eq('group_id', metaGroup.id)
+    .eq('short_id', betId)
     .single() as { data: any }
 
   if (!bet) return { title: 'Bet' }
@@ -81,7 +91,7 @@ export default async function BetDetailPage({
   if (!membershipData) redirect('/dashboard')
   const membership = membershipData as any
 
-  // Get bet with all related data
+  // Get bet with all related data (look up by short_id within group)
   const { data: betData } = await supabase
     .from('bets')
     .select(`
@@ -91,7 +101,8 @@ export default async function BetDetailPage({
       bet_votes(*),
       bet_proofs(*)
     `)
-    .eq('id', betId)
+    .eq('group_id', groupId)
+    .eq('short_id', betId)
     .single()
 
   if (!betData) notFound()

@@ -6,21 +6,22 @@ export const alt = 'Bet on FriendBets'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: Promise<{ id: string; betId: string }> }) {
-  const { id: groupId, betId } = await params
+export default async function Image({ params }: { params: Promise<{ slug: string; betId: string }> }) {
+  const { slug, betId } = await params
   const supabase = await createClient()
-
-  const { data: bet } = await supabase
-    .from('bets')
-    .select('title, description, status, bet_wagers(amount, side)')
-    .eq('id', betId)
-    .single() as { data: any }
 
   const { data: group } = await supabase
     .from('groups')
-    .select('name, currency_symbol')
-    .eq('id', groupId)
+    .select('id, name, currency_symbol')
+    .eq('slug', slug)
     .single() as { data: any }
+
+  const { data: bet } = group ? await supabase
+    .from('bets')
+    .select('title, description, status, bet_wagers(amount, side)')
+    .eq('group_id', group.id)
+    .eq('short_id', betId)
+    .single() as { data: any } : { data: null }
 
   const title = bet?.title ?? 'Bet'
   const status = bet?.status ?? 'open'

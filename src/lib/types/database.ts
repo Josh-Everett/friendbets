@@ -131,6 +131,7 @@ export interface Database {
       bets: {
         Row: {
           id: string
+          short_id: string
           group_id: string
           created_by: string
           title: string
@@ -151,6 +152,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          short_id?: string
           group_id: string
           created_by: string
           title: string
@@ -171,6 +173,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          short_id?: string
           group_id?: string
           created_by?: string
           title?: string

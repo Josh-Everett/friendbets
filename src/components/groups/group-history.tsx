@@ -65,7 +65,7 @@ export function GroupHistory({ groupId, groupSlug, currencySymbol }: GroupHistor
       {bets.map((bet: any) => {
         const totalPool = bet.bet_wagers?.reduce((s: number, w: any) => s + w.amount, 0) ?? 0
         return (
-          <Link key={bet.id} href={`/groups/${groupSlug}/bets/${bet.id}`}>
+          <Link key={bet.id} href={`/groups/${groupSlug}/bets/${bet.short_id}`}>
             <Card className="hover:border-white/10 transition-colors cursor-pointer">
               <CardContent className="py-4">
                 <div className="flex items-start justify-between gap-4">

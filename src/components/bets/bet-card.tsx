@@ -20,7 +20,7 @@ export function BetCard({ bet, groupSlug, currencySymbol }: BetCardProps) {
     : null
 
   return (
-    <Link href={`/groups/${groupSlug}/bets/${bet.id}`}>
+    <Link href={`/groups/${groupSlug}/bets/${bet.short_id}`}>
       <Card className="hover:border-white/10 transition-colors cursor-pointer">
         <CardContent className="py-4">
           <div className="flex items-start justify-between gap-4">
