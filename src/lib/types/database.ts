@@ -391,6 +391,76 @@ export interface Database {
           created_at?: string
         }
       }
+      game_pools: {
+        Row: {
+          id: string
+          group_id: string
+          game_type: string
+          balance: number
+          daily_high_score: number | null
+          daily_high_user_id: string | null
+          daily_reset_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          group_id: string
+          game_type: string
+          balance?: number
+          daily_high_score?: number | null
+          daily_high_user_id?: string | null
+          daily_reset_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          group_id?: string
+          game_type?: string
+          balance?: number
+          daily_high_score?: number | null
+          daily_high_user_id?: string | null
+          daily_reset_at?: string
+          created_at?: string
+        }
+      }
+      game_plays: {
+        Row: {
+          id: string
+          group_id: string
+          user_id: string
+          game_type: string
+          score: number
+          bet_amount: number
+          payout: number
+          is_winner: boolean
+          result: Record<string, unknown>
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          group_id: string
+          user_id: string
+          game_type: string
+          score?: number
+          bet_amount?: number
+          payout?: number
+          is_winner?: boolean
+          result?: Record<string, unknown>
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          group_id?: string
+          user_id?: string
+          game_type?: string
+          score?: number
+          bet_amount?: number
+          payout?: number
+          is_winner?: boolean
+          result?: Record<string, unknown>
+          created_at?: string
+        }
+      }
     }
     Functions: {
       buy_shares: {
@@ -433,6 +503,13 @@ export interface Database {
           p_starting_balance: number; p_slug: string | null
         }
         Returns: string
+      }
+      submit_game_score: {
+        Args: {
+          p_group_id: string; p_user_id: string; p_game_type: string;
+          p_score: number; p_bet_amount: number; p_result: Record<string, unknown>
+        }
+        Returns: Record<string, unknown>
       }
     }
     Views: {

@@ -65,3 +65,8 @@ export type SeasonRanking = {
   profit: number
   rank: number
 }
+
+// Game types
+export type GamePool = Database['public']['Tables']['game_pools']['Row']
+export type GamePlay = Database['public']['Tables']['game_plays']['Row']
+export type GamePlayWithProfile = GamePlay & { profiles: Profile }

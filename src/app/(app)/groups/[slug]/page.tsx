@@ -8,6 +8,7 @@ import { AchievementsList } from '@/components/achievements/achievements-list'
 import { GroupTabs } from '@/components/groups/group-tabs'
 import { CopyInviteButton } from '@/components/groups/copy-invite-button'
 import { BalanceHistoryChart } from '@/components/charts/balance-history-chart'
+import { GameLobby } from '@/components/games/game-lobby'
 
 export default async function GroupPage({
   params,
@@ -68,6 +69,27 @@ export default async function GroupPage({
 
   const members = (membersData ?? []) as any[]
 
+  // Fetch game pools for the games tab
+  let gamePools: Record<string, any> = {}
+  if (tab === 'games') {
+    const { data: poolsData } = await supabase
+      .from('game_pools')
+      .select('*')
+      .eq('group_id', groupId) as { data: any[] }
+
+    if (poolsData) {
+      const now = new Date()
+      for (const pool of poolsData) {
+        const resetAt = new Date(pool.daily_reset_at)
+        gamePools[pool.game_type] = {
+          balance: pool.balance,
+          daily_high_score: resetAt <= now ? null : pool.daily_high_score,
+          daily_high_user_id: resetAt <= now ? null : pool.daily_high_user_id,
+        }
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -99,6 +121,14 @@ export default async function GroupPage({
           currencySymbol={group.currency_symbol}
           userBalance={membership.balance}
           startingBalance={group.starting_balance}
+        />
+      )}
+      {tab === 'games' && (
+        <GameLobby
+          groupSlug={slug}
+          currencySymbol={group.currency_symbol}
+          pools={gamePools}
+          members={members}
         />
       )}
       {tab === 'leaderboard' && (
