@@ -8,6 +8,13 @@ export const GAMES: GameDefinition[] = [
     icon: '\uD83D\uDE81',
     category: 'solo-score',
   },
+  {
+    slug: 'skirun',
+    name: 'SkiRun',
+    description: 'Dodge trees and rocks as you race downhill. Beat the high score to win the pool!',
+    icon: '\u26F7\uFE0F',
+    category: 'solo-score',
+  },
 ]
 
 export function getGameBySlug(slug: string): GameDefinition | undefined {

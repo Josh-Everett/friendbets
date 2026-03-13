@@ -2,6 +2,7 @@
 
 import { GameWrapper } from '@/components/games/game-wrapper'
 import { HeliGame } from '@/lib/games/heli'
+import { SkiGame } from '@/lib/games/ski'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 
@@ -33,6 +34,7 @@ interface GamePageProps {
 
 const GAME_COMPONENTS: Record<string, React.ComponentType<any>> = {
   helicopter: HeliGame,
+  skirun: SkiGame,
 }
 
 export function GamePage({
