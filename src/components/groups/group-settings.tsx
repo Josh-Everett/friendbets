@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { InviteCodeDisplay } from './invite-code-display'
 import { MemberList } from './member-list'
+import { BannerUpload } from './banner-upload'
 import type { Group } from '@/lib/types/app'
 
 interface GroupSettingsProps {
@@ -11,6 +12,15 @@ interface GroupSettingsProps {
 export function GroupSettings({ group, members }: GroupSettingsProps) {
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <h2 className="text-lg font-semibold text-white">Group Banner</h2>
+        </CardHeader>
+        <CardContent>
+          <BannerUpload groupId={group.id} currentBannerUrl={group.banner_url} />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <h2 className="text-lg font-semibold text-white">Invite Friends</h2>

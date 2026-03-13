@@ -14,6 +14,7 @@ interface JoinGroupClientProps {
   startingBalance: number
   inviteCode: string
   groupSlug: string
+  bannerUrl: string | null
 }
 
 export function JoinGroupClient({
@@ -24,6 +25,7 @@ export function JoinGroupClient({
   startingBalance,
   inviteCode,
   groupSlug,
+  bannerUrl,
 }: JoinGroupClientProps) {
   const router = useRouter()
   const supabase = useSupabase()
@@ -51,7 +53,14 @@ export function JoinGroupClient({
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md overflow-hidden">
+      {bannerUrl && (
+        <img
+          src={bannerUrl}
+          alt={`${groupName} banner`}
+          className="w-full h-40 object-cover"
+        />
+      )}
       <CardContent className="pt-6 text-center space-y-4">
         <h1 className="text-2xl font-bold text-white">You&apos;re invited!</h1>
         <div>

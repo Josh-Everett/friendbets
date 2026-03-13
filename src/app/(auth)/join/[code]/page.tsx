@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   const description = group.description
     || `You've been invited to ${group.name} on FriendBets! Start with ${group.currency_symbol}${group.starting_balance.toLocaleString()} ${group.currency_name}.`
 
-  return {
+  const metadata: Metadata = {
     title,
     description,
     openGraph: {
@@ -36,6 +36,13 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
       description,
     },
   }
+
+  if (group.banner_url) {
+    metadata.openGraph!.images = [{ url: group.banner_url }]
+    metadata.twitter!.images = [group.banner_url]
+  }
+
+  return metadata
 }
 
 export default async function JoinPage({ params }: { params: Promise<{ code: string }> }) {
@@ -113,6 +120,7 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
         startingBalance={group.starting_balance}
         inviteCode={code.toUpperCase()}
         groupSlug={group.slug}
+        bannerUrl={group.banner_url}
       />
     </div>
   )

@@ -40,6 +40,7 @@ export interface Database {
           reset_frequency: 'weekly' | 'biweekly' | 'monthly' | 'quarterly'
           season_end_at: string | null
           current_season_number: number
+          banner_url: string | null
         }
         Insert: {
           id?: string
@@ -54,6 +55,7 @@ export interface Database {
           reset_frequency?: 'weekly' | 'biweekly' | 'monthly' | 'quarterly'
           season_end_at?: string | null
           current_season_number?: number
+          banner_url?: string | null
         }
         Update: {
           id?: string
@@ -68,6 +70,7 @@ export interface Database {
           reset_frequency?: 'weekly' | 'biweekly' | 'monthly' | 'quarterly'
           season_end_at?: string | null
           current_season_number?: number
+          banner_url?: string | null
         }
       }
       group_members: {
