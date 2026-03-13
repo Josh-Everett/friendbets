@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from '@/lib/constants'
+
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES]
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -13,6 +16,13 @@ export async function POST(request: Request) {
 
   if (!file_name || !content_type || !bet_id) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  if (!ALLOWED_TYPES.includes(content_type)) {
+    return NextResponse.json(
+      { error: 'File type not allowed. Accepted: JPEG, PNG, GIF, WebP, MP4, WebM, QuickTime' },
+      { status: 400 }
+    )
   }
 
   // Verify user is a member of the group this bet belongs to
