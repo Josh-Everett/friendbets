@@ -12,6 +12,8 @@ CREATE TABLE public.game_pools (
   daily_high_score integer,
   daily_high_user_id uuid REFERENCES public.profiles(id),
   daily_reset_at timestamptz NOT NULL DEFAULT (date_trunc('day', now() AT TIME ZONE 'UTC') + interval '1 day'),
+  all_time_high_score integer,
+  all_time_high_user_id uuid REFERENCES public.profiles(id),
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(group_id, game_type)
 );
@@ -185,6 +187,14 @@ BEGIN
     WHERE id = v_pool.id;
   END IF;
 
+  -- Update all-time high score if beaten
+  IF v_pool.all_time_high_score IS NULL OR p_score > v_pool.all_time_high_score THEN
+    UPDATE public.game_pools
+    SET all_time_high_score = p_score,
+        all_time_high_user_id = p_user_id
+    WHERE id = v_pool.id;
+  END IF;
+
   -- Record the play
   INSERT INTO public.game_plays (group_id, user_id, game_type, score, bet_amount, payout, is_winner, result)
   VALUES (p_group_id, p_user_id, p_game_type, p_score, p_bet_amount, v_payout, v_won, p_result)
@@ -211,6 +221,7 @@ BEGIN
     'won_pool', v_won,
     'payout', v_payout,
     'new_daily_high', GREATEST(COALESCE(v_pool.daily_high_score, 0), p_score),
+    'new_all_time_high', GREATEST(COALESCE(v_pool.all_time_high_score, 0), p_score),
     'new_pool', v_pool_balance,
     'new_balance', v_new_balance
   );

@@ -21,6 +21,8 @@ interface GameWrapperProps {
   currencySymbol: string
   dailyHigh: number | null
   dailyHighUser: string | null
+  allTimeHigh: number | null
+  allTimeHighUser: string | null
   prizePool: number
   children: (props: {
     onGameEnd: (result: GameResult) => void
@@ -47,6 +49,8 @@ export function GameWrapper({
   currencySymbol,
   dailyHigh,
   dailyHighUser,
+  allTimeHigh,
+  allTimeHighUser,
   prizePool,
   children,
 }: GameWrapperProps) {
@@ -146,10 +150,15 @@ export function GameWrapper({
       <div className="flex items-center gap-3 flex-wrap">
         {dailyHigh != null ? (
           <Badge variant="default">
-            High: {dailyHigh}{dailyHighUser ? ` by ${dailyHighUser}` : ''}
+            Today: {dailyHigh}{dailyHighUser ? ` by ${dailyHighUser}` : ''}
           </Badge>
         ) : (
           <Badge variant="default">No plays today</Badge>
+        )}
+        {allTimeHigh != null && (
+          <Badge variant="warning">
+            Record: {allTimeHigh}{allTimeHighUser ? ` by ${allTimeHighUser}` : ''}
+          </Badge>
         )}
         {prizePool > 0 && (
           <Badge variant="gold">

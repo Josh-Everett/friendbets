@@ -85,6 +85,8 @@ export default async function GroupPage({
           balance: pool.balance,
           daily_high_score: resetAt <= now ? null : pool.daily_high_score,
           daily_high_user_id: resetAt <= now ? null : pool.daily_high_user_id,
+          all_time_high_score: pool.all_time_high_score,
+          all_time_high_user_id: pool.all_time_high_user_id,
         }
       }
     }

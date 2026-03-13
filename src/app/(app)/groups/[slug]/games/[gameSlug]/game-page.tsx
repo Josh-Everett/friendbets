@@ -16,6 +16,8 @@ interface GamePageProps {
   currencySymbol: string
   dailyHigh: number | null
   dailyHighUser: string | null
+  allTimeHigh: number | null
+  allTimeHighUser: string | null
   prizePool: number
   todayPlays: Array<{
     id: string
@@ -44,6 +46,8 @@ export function GamePage({
   currencySymbol,
   dailyHigh,
   dailyHighUser,
+  allTimeHigh,
+  allTimeHighUser,
   prizePool,
   todayPlays,
 }: GamePageProps) {
@@ -62,6 +66,8 @@ export function GamePage({
         currencySymbol={currencySymbol}
         dailyHigh={dailyHigh}
         dailyHighUser={dailyHighUser}
+        allTimeHigh={allTimeHigh}
+        allTimeHighUser={allTimeHighUser}
         prizePool={prizePool}
       >
         {({ onGameEnd, onGameStart }) => (

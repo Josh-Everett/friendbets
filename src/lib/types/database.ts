@@ -400,6 +400,8 @@ export interface Database {
           daily_high_score: number | null
           daily_high_user_id: string | null
           daily_reset_at: string
+          all_time_high_score: number | null
+          all_time_high_user_id: string | null
           created_at: string
         }
         Insert: {
@@ -410,6 +412,8 @@ export interface Database {
           daily_high_score?: number | null
           daily_high_user_id?: string | null
           daily_reset_at?: string
+          all_time_high_score?: number | null
+          all_time_high_user_id?: string | null
           created_at?: string
         }
         Update: {
@@ -420,6 +424,8 @@ export interface Database {
           daily_high_score?: number | null
           daily_high_user_id?: string | null
           daily_reset_at?: string
+          all_time_high_score?: number | null
+          all_time_high_user_id?: string | null
           created_at?: string
         }
       }

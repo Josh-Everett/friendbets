@@ -48,34 +48,41 @@ export default async function GamePageServer({
   // Check for daily reset on pool data
   let dailyHigh: number | null = null
   let dailyHighUserId: string | null = null
+  let allTimeHigh: number | null = null
+  let allTimeHighUserId: string | null = null
   let poolBalance = 0
 
   if (poolData) {
     const resetAt = new Date(poolData.daily_reset_at)
     if (resetAt <= new Date()) {
-      // Pool needs daily reset — high score is stale
       dailyHigh = null
       dailyHighUserId = null
     } else {
       dailyHigh = poolData.daily_high_score
       dailyHighUserId = poolData.daily_high_user_id
     }
+    allTimeHigh = poolData.all_time_high_score
+    allTimeHighUserId = poolData.all_time_high_user_id
     poolBalance = poolData.balance
   }
 
-  // Get username for high score holder
-  let dailyHighUser: string | null = null
-  if (dailyHighUserId) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('username, display_name')
-      .eq('id', dailyHighUserId)
-      .single() as { data: any }
+  // Get usernames for high score holders
+  const profileIds = [dailyHighUserId, allTimeHighUserId].filter(Boolean) as string[]
+  const profileMap: Record<string, string> = {}
 
-    if (profile) {
-      dailyHighUser = profile.display_name || profile.username
+  if (profileIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, username, display_name')
+      .in('id', profileIds) as { data: any[] }
+
+    for (const p of profiles ?? []) {
+      profileMap[p.id] = p.display_name || p.username
     }
   }
+
+  const dailyHighUser = dailyHighUserId ? profileMap[dailyHighUserId] ?? null : null
+  const allTimeHighUser = allTimeHighUserId ? profileMap[allTimeHighUserId] ?? null : null
 
   // Get today's plays for this game in this group
   const todayStart = new Date()
@@ -102,6 +109,8 @@ export default async function GamePageServer({
       currencySymbol={group.currency_symbol}
       dailyHigh={dailyHigh}
       dailyHighUser={dailyHighUser}
+      allTimeHigh={allTimeHigh}
+      allTimeHighUser={allTimeHighUser}
       prizePool={poolBalance}
       todayPlays={todayPlays ?? []}
     />
