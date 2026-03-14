@@ -11,6 +11,7 @@ interface GroupTabsProps {
 
 const tabs = [
   { id: 'bets', label: 'Bets' },
+  { id: 'exchange', label: 'Exchange' },
   { id: 'games', label: 'Games' },
   { id: 'leaderboard', label: 'Leaderboard' },
   { id: 'history', label: 'History' },

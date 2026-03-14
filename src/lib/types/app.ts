@@ -67,6 +67,14 @@ export type SeasonRanking = {
 }
 
 // Game types
+// Exchange types
+export type Exchange = Database['public']['Tables']['exchanges']['Row']
+export type ExchangeWithProfiles = Exchange & {
+  profiles: Profile
+  claimer: Profile | null
+}
+export type ExchangeStatus = 'open' | 'claimed' | 'completed' | 'cancelled'
+
 export type GamePool = Database['public']['Tables']['game_pools']['Row']
 export type GamePlay = Database['public']['Tables']['game_plays']['Row']
 export type GamePlayWithProfile = GamePlay & { profiles: Profile }

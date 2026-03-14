@@ -22,6 +22,20 @@ export const BET_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-red-500/20 text-red-400',
 }
 
+export const EXCHANGE_STATUS_LABELS: Record<string, string> = {
+  open: 'Open',
+  claimed: 'Claimed',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+}
+
+export const EXCHANGE_STATUS_COLORS: Record<string, string> = {
+  open: 'bg-green-500/20 text-green-400',
+  claimed: 'bg-yellow-500/20 text-yellow-400',
+  completed: 'bg-blue-500/20 text-blue-400',
+  cancelled: 'bg-red-500/20 text-red-400',
+}
+
 export const MAX_PROOF_SIZE = 50 * 1024 * 1024 // 50MB
 export const MAX_BANNER_SIZE = 5 * 1024 * 1024 // 5MB
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']

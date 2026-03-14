@@ -9,6 +9,7 @@ import { GroupTabs } from '@/components/groups/group-tabs'
 import { CopyInviteButton } from '@/components/groups/copy-invite-button'
 import { BalanceHistoryChart } from '@/components/charts/balance-history-chart'
 import { GameLobby } from '@/components/games/game-lobby'
+import { ExchangeFeed } from '@/components/exchanges/exchange-feed'
 
 export default async function GroupPage({
   params,
@@ -123,6 +124,14 @@ export default async function GroupPage({
           currencySymbol={group.currency_symbol}
           userBalance={membership.balance}
           startingBalance={group.starting_balance}
+        />
+      )}
+      {tab === 'exchange' && (
+        <ExchangeFeed
+          groupId={groupId}
+          userId={user!.id}
+          currencySymbol={group.currency_symbol}
+          userBalance={membership.balance}
         />
       )}
       {tab === 'games' && (

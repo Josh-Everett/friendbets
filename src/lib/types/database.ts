@@ -467,6 +467,47 @@ export interface Database {
           created_at?: string
         }
       }
+      exchanges: {
+        Row: {
+          id: string
+          group_id: string
+          created_by: string
+          title: string
+          description: string | null
+          reward: number
+          status: 'open' | 'claimed' | 'completed' | 'cancelled'
+          claimed_by: string | null
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          group_id: string
+          created_by: string
+          title: string
+          description?: string | null
+          reward: number
+          status?: 'open' | 'claimed' | 'completed' | 'cancelled'
+          claimed_by?: string | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          group_id?: string
+          created_by?: string
+          title?: string
+          description?: string | null
+          reward?: number
+          status?: 'open' | 'claimed' | 'completed' | 'cancelled'
+          claimed_by?: string | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+        }
+      }
     }
     Functions: {
       buy_shares: {
@@ -516,6 +557,21 @@ export interface Database {
           p_score: number; p_bet_amount: number; p_result: Record<string, unknown>
         }
         Returns: Record<string, unknown>
+      }
+      create_exchange: {
+        Args: {
+          p_group_id: string; p_created_by: string; p_title: string;
+          p_description: string | null; p_reward: number
+        }
+        Returns: string
+      }
+      complete_exchange: {
+        Args: { p_exchange_id: string; p_completed_by: string }
+        Returns: void
+      }
+      cancel_exchange: {
+        Args: { p_exchange_id: string; p_cancelled_by: string }
+        Returns: void
       }
     }
     Views: {
