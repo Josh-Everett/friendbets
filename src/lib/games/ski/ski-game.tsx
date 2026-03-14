@@ -32,6 +32,13 @@ const BUMP_W = 14
 const BUMP_H = 4
 const HIT_SHRINK = 3
 
+// --- Yeti ---
+const YETI_SPAWN_DIST = 6000   // ~2000m score
+const YETI_SPEED = 6.0          // faster than normal, beatable with turbo
+const YETI_HORIZ_SPEED = 3.5    // horizontal tracking
+const YETI_START_BEHIND = 350   // world units behind skier at spawn
+const YETI_WARN_DIST = 300      // warning starts this far before spawn
+
 type ObstacleType = 'tree' | 'rock' | 'bump' | 'ramp'
 
 interface Obstacle {
@@ -64,6 +71,12 @@ interface State {
   boost: boolean
   airTime: number // frames in air (from ramp)
   crashTimer: number
+  yetiActive: boolean
+  yetiDist: number   // world Y
+  yetiX: number      // world X
+  yetiFrame: number
+  yetiWarning: number // countdown frames
+  eaten: boolean
 }
 
 function fresh(): State {
@@ -80,6 +93,12 @@ function fresh(): State {
     boost: false,
     airTime: 0,
     crashTimer: 0,
+    yetiActive: false,
+    yetiDist: 0,
+    yetiX: 0,
+    yetiFrame: 0,
+    yetiWarning: 0,
+    eaten: false,
   }
 }
 
@@ -301,6 +320,136 @@ function drawCrashedSkier(ctx: CanvasRenderingContext2D, x: number, y: number, t
   ctx.rotate(1.2)
   ctx.fillRect(0, 0, 1, 8)
   ctx.restore()
+}
+
+function drawYeti(ctx: CanvasRenderingContext2D, x: number, y: number, frame: number) {
+  const f = Math.floor(frame / 6) % 2
+
+  // Legs (behind body)
+  ctx.fillStyle = '#CCCCEE'
+  if (f === 0) {
+    ctx.fillRect(x - 7, y + 14, 6, 8)
+    ctx.fillRect(x + 1, y + 14, 6, 6)
+  } else {
+    ctx.fillRect(x - 7, y + 14, 6, 6)
+    ctx.fillRect(x + 1, y + 14, 6, 8)
+  }
+  // Feet
+  ctx.fillStyle = '#AAAACC'
+  ctx.fillRect(x - 8, y + 20 + (f === 0 ? 2 : 0), 7, 3)
+  ctx.fillRect(x + 1, y + 20 + (f === 1 ? 2 : 0), 7, 3)
+
+  // Body
+  ctx.fillStyle = '#DDDDF0'
+  ctx.fillRect(x - 10, y - 6, 20, 22)
+
+  // Fur highlights
+  ctx.fillStyle = '#EEEEFF'
+  ctx.fillRect(x - 8, y - 4, 5, 3)
+  ctx.fillRect(x + 3, y, 5, 3)
+  ctx.fillRect(x - 5, y + 6, 4, 3)
+  ctx.fillRect(x + 2, y + 10, 4, 3)
+
+  // Arms - animated running
+  ctx.fillStyle = '#DDDDF0'
+  if (f === 0) {
+    ctx.fillRect(x - 16, y - 8, 7, 5)
+    ctx.fillRect(x + 9, y + 2, 7, 5)
+  } else {
+    ctx.fillRect(x + 9, y - 8, 7, 5)
+    ctx.fillRect(x - 16, y + 2, 7, 5)
+  }
+  // Claws
+  ctx.fillStyle = '#888899'
+  if (f === 0) {
+    ctx.fillRect(x - 17, y - 8, 2, 3)
+    ctx.fillRect(x + 15, y + 2, 2, 3)
+  } else {
+    ctx.fillRect(x + 15, y - 8, 2, 3)
+    ctx.fillRect(x - 17, y + 2, 2, 3)
+  }
+
+  // Head
+  ctx.fillStyle = '#DDDDF0'
+  ctx.fillRect(x - 8, y - 18, 16, 14)
+
+  // Brow ridge
+  ctx.fillStyle = '#CCCCDD'
+  ctx.fillRect(x - 7, y - 14, 14, 2)
+
+  // Eyes (angry, dark)
+  ctx.fillStyle = '#220000'
+  ctx.fillRect(x - 5, y - 12, 3, 3)
+  ctx.fillRect(x + 2, y - 12, 3, 3)
+  // Eye glint
+  ctx.fillStyle = '#FF3333'
+  ctx.fillRect(x - 4, y - 11, 1, 1)
+  ctx.fillRect(x + 3, y - 11, 1, 1)
+
+  // Mouth (open, angry)
+  ctx.fillStyle = '#880000'
+  ctx.fillRect(x - 4, y - 7, 8, 3)
+  // Teeth
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(x - 3, y - 7, 2, 2)
+  ctx.fillRect(x + 1, y - 7, 2, 2)
+}
+
+function drawYetiEating(ctx: CanvasRenderingContext2D, x: number, y: number, timer: number) {
+  const chomp = Math.floor(timer / 10) % 2
+
+  // Draw yeti standing still, holding skier overhead
+  // Body
+  ctx.fillStyle = '#DDDDF0'
+  ctx.fillRect(x - 10, y - 6, 20, 22)
+  ctx.fillStyle = '#EEEEFF'
+  ctx.fillRect(x - 8, y - 4, 5, 3)
+  ctx.fillRect(x + 3, y, 5, 3)
+
+  // Legs planted
+  ctx.fillStyle = '#CCCCEE'
+  ctx.fillRect(x - 7, y + 14, 6, 8)
+  ctx.fillRect(x + 1, y + 14, 6, 8)
+  ctx.fillStyle = '#AAAACC'
+  ctx.fillRect(x - 8, y + 22, 7, 3)
+  ctx.fillRect(x + 1, y + 22, 7, 3)
+
+  // Arms up holding skier
+  ctx.fillStyle = '#DDDDF0'
+  ctx.fillRect(x - 14, y - 20, 7, 5)
+  ctx.fillRect(x + 7, y - 20, 7, 5)
+
+  // Head with chomping mouth
+  ctx.fillStyle = '#DDDDF0'
+  ctx.fillRect(x - 8, y - 18, 16, 14)
+  ctx.fillStyle = '#CCCCDD'
+  ctx.fillRect(x - 7, y - 14, 14, 2)
+  ctx.fillStyle = '#220000'
+  ctx.fillRect(x - 5, y - 12, 3, 3)
+  ctx.fillRect(x + 2, y - 12, 3, 3)
+  ctx.fillStyle = '#FF3333'
+  ctx.fillRect(x - 4, y - 11, 1, 1)
+  ctx.fillRect(x + 3, y - 11, 1, 1)
+
+  // Chomping mouth
+  ctx.fillStyle = '#880000'
+  ctx.fillRect(x - 4, y - 7, 8, chomp ? 4 : 2)
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(x - 3, y - 7, 2, chomp ? 2 : 1)
+  ctx.fillRect(x + 1, y - 7, 2, chomp ? 2 : 1)
+
+  // Skier being held/eaten overhead (flailing)
+  const flail = Math.sin(timer * 0.8) * 3
+  ctx.fillStyle = '#DD0000'
+  ctx.fillRect(x - 3 + flail, y - 28, 6, 4)
+  ctx.fillStyle = '#0000BB'
+  ctx.fillRect(x - 2 + flail, y - 24, 5, 3)
+  ctx.fillStyle = '#FFD0A0'
+  ctx.fillRect(x - 1 + flail, y - 30, 3, 3)
+  // Tiny flailing limbs
+  ctx.fillStyle = '#000000'
+  ctx.fillRect(x - 5 + flail, y - 26, 3, 1)
+  ctx.fillRect(x + 4 + flail, y - 27, 3, 1)
 }
 
 // ============================================================
@@ -547,6 +696,48 @@ export function SkiGame({ onGameEnd, onGameStart }: GameComponentProps) {
         }
       }
 
+      // --- Yeti ---
+      if (!s.yetiActive && s.distance >= YETI_SPAWN_DIST - YETI_WARN_DIST && s.yetiWarning === 0) {
+        s.yetiWarning = 120 // 2 seconds of warning
+      }
+
+      if (s.yetiWarning > 0) {
+        s.yetiWarning--
+        if (s.yetiWarning === 0 && !s.yetiActive) {
+          s.yetiActive = true
+          s.yetiDist = s.distance - YETI_START_BEHIND
+          s.yetiX = s.worldX
+          s.yetiFrame = 0
+        }
+      }
+
+      if (s.yetiActive && !s.eaten) {
+        s.yetiFrame++
+        // Yeti moves downhill at fixed speed
+        s.yetiDist += YETI_SPEED
+        // Track skier horizontally
+        const dx = s.worldX - s.yetiX
+        if (Math.abs(dx) > 1) {
+          s.yetiX += Math.sign(dx) * Math.min(YETI_HORIZ_SPEED, Math.abs(dx))
+        }
+
+        // Check if yeti caught skier
+        const yetiScreenY = SKIER_Y + (s.yetiDist - s.distance)
+        const yetiScreenX = W / 2 + (s.yetiX - s.worldX)
+        if (yetiScreenY >= SKIER_Y - 10 && Math.abs(yetiScreenX - SKIER_X) < 20) {
+          s.eaten = true
+          s.phase = 'crashed'
+          s.crashTimer = 0
+          // Snap yeti to skier position
+          s.yetiDist = s.distance
+          s.yetiX = s.worldX
+          if (!endedRef.current) {
+            endedRef.current = true
+            onGameEnd({ score: Math.floor(s.distance / 3) })
+          }
+        }
+      }
+
       // Remove obstacles far behind
       s.obstacles = s.obstacles.filter((o) => o.y > s.distance - 100)
     }
@@ -607,6 +798,17 @@ export function SkiGame({ onGameEnd, onGameStart }: GameComponentProps) {
         drawSkierOrCrash(ctx, s)
       }
 
+      // Draw yeti
+      if (s.yetiActive) {
+        const yetiScreenX = W / 2 + (s.yetiX - s.worldX)
+        const yetiScreenY = SKIER_Y + (s.yetiDist - s.distance)
+        if (s.eaten) {
+          drawYetiEating(ctx, SKIER_X, SKIER_Y, s.crashTimer)
+        } else {
+          drawYeti(ctx, yetiScreenX, yetiScreenY, s.yetiFrame)
+        }
+      }
+
       // Snow spray particles
       for (const p of s.particles) {
         const alpha = p.life / 14
@@ -626,6 +828,21 @@ export function SkiGame({ onGameEnd, onGameStart }: GameComponentProps) {
         ctx.fillStyle = '#CC0000'
         ctx.font = 'bold 11px monospace'
         ctx.fillText('TURBO', 12, 40)
+      }
+
+      // Yeti warning
+      if (s.yetiWarning > 0 && s.phase === 'playing') {
+        const flash = Math.floor(s.yetiWarning / 8) % 2
+        if (flash === 0) {
+          ctx.fillStyle = '#CC0000'
+          ctx.font = 'bold 18px monospace'
+          ctx.textAlign = 'center'
+          ctx.fillText('WATCH OUT!', W / 2, 60)
+          ctx.font = '11px monospace'
+          ctx.fillStyle = '#666666'
+          ctx.fillText('Something is coming...', W / 2, 78)
+          ctx.textAlign = 'left'
+        }
       }
 
       // Ready overlay
@@ -650,21 +867,42 @@ export function SkiGame({ onGameEnd, onGameStart }: GameComponentProps) {
       if (s.phase === 'crashed') {
         s.crashTimer++
 
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'
-        ctx.fillRect(0, 0, W, H)
+        if (s.eaten) {
+          // Yeti eating animation plays for a bit, then show score
+          if (s.crashTimer > 40) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+            ctx.fillRect(0, 0, W, H)
 
-        ctx.fillStyle = '#CC0000'
-        ctx.font = 'bold 24px monospace'
-        ctx.textAlign = 'center'
-        ctx.fillText('CRASHED!', W / 2, H / 2 - 20)
+            ctx.fillStyle = '#CC0000'
+            ctx.font = 'bold 24px monospace'
+            ctx.textAlign = 'center'
+            ctx.fillText('EATEN!', W / 2, H / 2 + 60)
 
-        ctx.fillStyle = '#000000'
-        ctx.font = 'bold 36px monospace'
-        ctx.fillText(`${meters}m`, W / 2, H / 2 + 20)
+            ctx.fillStyle = '#000000'
+            ctx.font = 'bold 36px monospace'
+            ctx.fillText(`${meters}m`, W / 2, H / 2 + 100)
+          }
+        } else {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'
+          ctx.fillRect(0, 0, W, H)
+
+          ctx.fillStyle = '#CC0000'
+          ctx.font = 'bold 24px monospace'
+          ctx.textAlign = 'center'
+          ctx.fillText('CRASHED!', W / 2, H / 2 - 20)
+
+          ctx.fillStyle = '#000000'
+          ctx.font = 'bold 36px monospace'
+          ctx.fillText(`${meters}m`, W / 2, H / 2 + 20)
+        }
       }
     }
 
     function drawSkierOrCrash(ctx: CanvasRenderingContext2D, s: State) {
+      if (s.eaten) {
+        // Yeti eating animation draws the skier — skip here
+        return
+      }
       if (s.phase === 'crashed') {
         drawCrashedSkier(ctx, SKIER_X, SKIER_Y, s.crashTimer)
       } else {
