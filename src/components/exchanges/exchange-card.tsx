@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,10 +11,10 @@ interface ExchangeCardProps {
   exchange: any
   userId: string
   currencySymbol: string
+  onAction: () => void
 }
 
-export function ExchangeCard({ exchange, userId, currencySymbol }: ExchangeCardProps) {
-  const router = useRouter()
+export function ExchangeCard({ exchange, userId, currencySymbol, onAction }: ExchangeCardProps) {
   const [loading, setLoading] = useState('')
 
   const creatorName = exchange.profiles?.display_name || exchange.profiles?.username || 'Unknown'
@@ -53,7 +52,7 @@ export function ExchangeCard({ exchange, userId, currencySymbol }: ExchangeCardP
       })
 
       if (res.ok) {
-        router.refresh()
+        onAction()
       }
     } catch {
       // silently fail — user can retry

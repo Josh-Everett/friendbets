@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
@@ -22,20 +22,20 @@ export function ExchangeFeed({ groupId, userId, currencySymbol, userBalance }: E
   const [showCreate, setShowCreate] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchExchanges() {
-      const { data } = await supabase
-        .from('exchanges')
-        .select('*, profiles:created_by(*), claimer:claimed_by(*)')
-        .eq('group_id', groupId)
-        .order('created_at', { ascending: false }) as { data: any }
+  const fetchExchanges = useCallback(async () => {
+    const { data } = await supabase
+      .from('exchanges')
+      .select('*, profiles:created_by(*), claimer:claimed_by(*)')
+      .eq('group_id', groupId)
+      .order('created_at', { ascending: false }) as { data: any }
 
-      setExchanges(data ?? [])
-      setLoading(false)
-    }
-
-    fetchExchanges()
+    setExchanges(data ?? [])
+    setLoading(false)
   }, [supabase, groupId])
+
+  useEffect(() => {
+    fetchExchanges()
+  }, [fetchExchanges])
 
   const activeExchanges = exchanges.filter((e) => e.status === 'open' || e.status === 'claimed')
 
@@ -73,6 +73,7 @@ export function ExchangeFeed({ groupId, userId, currencySymbol, userBalance }: E
               exchange={exchange}
               userId={userId}
               currencySymbol={currencySymbol}
+              onAction={fetchExchanges}
             />
           ))}
         </div>
@@ -82,7 +83,7 @@ export function ExchangeFeed({ groupId, userId, currencySymbol, userBalance }: E
         <CreateExchangeForm
           groupId={groupId}
           userBalance={userBalance}
-          onSuccess={() => setShowCreate(false)}
+          onSuccess={() => { setShowCreate(false); fetchExchanges() }}
         />
       </Dialog>
     </div>
