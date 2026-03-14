@@ -44,6 +44,8 @@ DECLARE
   v_current_balance integer;
   v_exchange_id uuid;
 BEGIN
+  PERFORM set_config('app.bypass_member_guard', 'true', true);
+
   -- Verify user is a group member and get their balance
   SELECT balance INTO v_current_balance
   FROM public.group_members
@@ -84,6 +86,8 @@ RETURNS void AS $$
 DECLARE
   v_exchange RECORD;
 BEGIN
+  PERFORM set_config('app.bypass_member_guard', 'true', true);
+
   -- Fetch the exchange
   SELECT * INTO v_exchange
   FROM public.exchanges
@@ -127,6 +131,8 @@ DECLARE
   v_exchange RECORD;
   v_role text;
 BEGIN
+  PERFORM set_config('app.bypass_member_guard', 'true', true);
+
   -- Fetch the exchange
   SELECT * INTO v_exchange
   FROM public.exchanges
